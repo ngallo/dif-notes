@@ -61,8 +61,7 @@ Only in asynchronous flows do the fundamental constraints emerge:
 - **Minting replacements violates subject integrity.**  
 - **Capability must be delegated, not replayed.**
 
-The async boundary is not an edge case —  
-it is the **proof** that the entire snapshot-based model is a subset.
+The async boundary is not an edge case —  it is the **proof** that the entire snapshot-based model is a subset.
 
 ---
 
