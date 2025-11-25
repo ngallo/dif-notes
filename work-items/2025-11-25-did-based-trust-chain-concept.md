@@ -1,6 +1,6 @@
 # DID-based Trust Chains for Workloads and Agents
 
-This document is a simplified concept related to the proposal in [DIF Work Item Proposal (Draft)](2025-11-24-dif-work-item-proposal.md) and is intended to illustrate the core idea of using DID-based trust chains for workloads and agents.
+This document is explains concepts related to the proposal in [DIF Work Item Proposal (Draft)](2025-11-24-dif-work-item-proposal.md) and is intended to illustrate the core idea of using DID-based trust chains for workloads and agents.
 
 ## Paradigm Shift for Authorization in Distributed Transactions
 
@@ -44,6 +44,69 @@ it enables the holder to perform a specific action without embedding personal id
 
 In a distributed transaction model, a capability token is **valid only for the transaction in which it was delegated** (the authorized trip).  
 Outside that transaction scope, the token is **inert**.
+
+## Building the Superset Security Model
+
+Reasoning from trivial cases is meaningless.  
+Synchronous handoffs (in-memory, single hop, no queues) always validate the legacy model.  
+They do not test its limits and therefore cannot demonstrate a superset.
+
+To prove a superset, we must start from the **principal case**:  
+the environment where distributed transactions actually operate — **asynchronous messaging**.
+
+Only in asynchronous flows do the fundamental constraints emerge:
+
+- **Identity continuity cannot be assumed across asynchronous boundaries.**  
+- **Bearer tokens cannot preserve holder-authenticity or capability-context across asynchronous boundaries.**  
+- **Minting replacements violates subject integrity.**  
+- **Capability must be delegated, not replayed.**
+
+The async boundary is not an edge case —  
+it is the **proof** that the entire snapshot-based model is a subset.
+
+---
+
+### The Fundamental Constraint
+
+A bearer token **cannot preserve its security semantics or holder binding** across asynchronous boundaries.  
+Forwarded as payload, it becomes detached from the holder: signature does not reconstitute holder-binding.  
+Therefore, bearer-token identity is a **subset** of the superset model.
+
+---
+
+### Identity Rules in Distributed Transactions
+
+1. **If you are not the Subject, you MUST NOT mint or issue a token on behalf of the Subject.**  
+2. **Distributed transactions operate as: Holder → Verifier → Holder → Verifier.**
+
+In-memory handoffs preserve continuity (a Verifier MAY become the next Holder).  
+Asynchronous boundaries do not: the next Holder has no Subject token.  
+Minting a new token at this point **violates Rule 1**.
+
+> **Token-based identity continuity CANNOT be preserved across asynchronous boundaries.**  
+> Such flows become discontinuous unless the underlying protocol was designed to tolerate token fragmentation.
+
+---
+
+### Shifting the Model
+
+The Holder does **not** forward the token.  
+The Holder delegates capability to the Verifier via an attestation issued by the Trust Plane.
+
+The Verifier MUST prove:
+
+- its own identity continuity, and  
+- that the capability was delegated by the previous hop.
+
+We no longer forward the Subject token.  
+We forward **proof of delegated capability**.
+
+The delegated Agent (human, machine, or AI) is anchored to its DID.  
+Capability metadata is embedded in the trust envelope.
+
+The Agent is not a token holder —  
+it is a **verifiable participant in the capability chain**,  
+able to act under delegated authority **without credential leakage**.
 
 ## Appendix
 
