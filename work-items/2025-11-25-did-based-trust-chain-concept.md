@@ -2,6 +2,8 @@
 
 This document is explains concepts related to the proposal in [DIF Work Item Proposal (Draft)](2025-11-24-dif-work-item-proposal.md) and is intended to illustrate the core idea of using DID-based trust chains for workloads and agents.
 
+This document includes important requirements from the previous Trusted AI Working Group at DIF session, where we defined the components, as well as requirements from Alan Karp.
+
 ## Paradigm Shift for Authorization in Distributed Transactions
 
 The current approach aims to define a robust authorization flow that supports workloads and AI Agents.  
