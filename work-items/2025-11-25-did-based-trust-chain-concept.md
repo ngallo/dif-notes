@@ -201,10 +201,10 @@ Let us now assume that the entity previously referred to as the “Red Corporate
 
 During the Trusted AI Agent working session, Alan Karp articulated the core requirement for a Trusted AI Agent:
 
-> **The possession of a valid token is not sufficient.  
+> **The possession of a valid token/capability is not sufficient.  
 > Authorization must depend on whether the Agent is trusted for the specific task/risk model.  
 > If the capability involves payment, and the Agent is not trusted for financial operations,  
-> the authorization MUST be denied even if the Agent presents a valid token.**
+> the authorization MUST be denied even if the Agent presents a token/capability.**
 
 This requirement illustrates why token-based authorization is insufficient in distributed systems.
 
