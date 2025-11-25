@@ -28,7 +28,7 @@ The paradigm is based on a core assumption:
 
 1. **Distributed transactions MUST continue to operate across asynchronous boundaries, including message flows where bearer tokens dissolve.**
 
-2. **Transaction rails MUST define a consistent security model applicable to both public internet and private/enterprise environments.**
+2. **Transaction rails MUST enable a consistent security model applicable to both public internet and private/enterprise environments.**
 
 3. **A capability token MUST NOT be treated as valid outside the distributed transaction that delegated it.**
 
