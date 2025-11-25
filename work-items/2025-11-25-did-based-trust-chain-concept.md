@@ -216,8 +216,7 @@ Assume the AI Agent has its own DID.
 Its DID is registered in a decentralized DID Trust Registry.
 
 > **NOTE:** The [Trusted AI Agents Working Group (WG) Components]  
-> (https://github.com/decentralized-identity/trusted-ai-agents/blob/main/work_items/use_cases/use-case-clusters-components.md)  
-> define how trust properties, identity, and capabilities are represented.
+> (https://github.com/decentralized-identity/trusted-ai-agents/blob/main/work_items/use_cases/use-case-clusters-components.md) define how trust properties, identity, and capabilities are represented.
 
 ![Token  case](./images/distributed-transaction-ai.png)
 
