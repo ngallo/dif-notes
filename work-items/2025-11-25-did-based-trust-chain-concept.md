@@ -63,15 +63,11 @@ Only in asynchronous flows do the fundamental constraints emerge:
 
 The async boundary is not an edge case —  it is the **proof** that the entire snapshot-based model is a subset.
 
----
-
 ### The Fundamental Constraint
 
 A bearer token **cannot preserve its security semantics or holder binding** across asynchronous boundaries.  
 Forwarded as payload, it becomes detached from the holder: signature does not reconstitute holder-binding.  
 Therefore, bearer-token identity is a **subset** of the superset model.
-
----
 
 ### Identity Rules in Distributed Transactions
 
@@ -84,8 +80,6 @@ Minting a new token at this point **violates Rule 1**.
 
 > **Token-based identity continuity CANNOT be preserved across asynchronous boundaries.**  
 > Such flows become discontinuous unless the underlying protocol was designed to tolerate token fragmentation.
-
----
 
 ### Shifting the Model
 
@@ -106,6 +100,155 @@ Capability metadata is embedded in the trust envelope.
 The Agent is not a token holder —  
 it is a **verifiable participant in the capability chain**,  
 able to act under delegated authority **without credential leakage**.
+
+## The Reference Use Case
+
+The smallest use case that demonstrates the superset model is a **three-hop distributed transaction** crossing a single asynchronous boundary.
+
+### Actors
+
+- **Alice** — Human Subject and initial Holder.  
+- **RedCorporate API** — first Verifier.  
+- **Kafka Topic** — asynchronous boundary.  
+- **RedCorporate Consumer** — second Holder.  
+- **GreenCorporate API** — second Verifier.
+
+### Transaction Sequence
+
+1. **Alice authenticates and receives a JWT (capability snapshot).**  
+   The JWT binds Alice’s identity to a set of permissions at issuance time.
+
+2. **Alice → RedCorporate API (Holder → Verifier).**  
+   Identity continuity is preserved: the Verifier can validate holder-binding.
+
+3. **RedCorporate API emits an event to Kafka (asynchronous boundary).**  
+   **At this boundary, holder-binding cannot be preserved.**  
+   The token or claims lose their semantic link to the actor who presented them.
+
+   **To place the token into a message, the API must either:**
+   - **strip its transport signature**, turning it into plain payload, or  
+   - **encrypt/encapsulate it**, turning it into a sealed blob.
+
+   **Neither option preserves holder-binding.**
+   - Removing the signature removes the guarantee that the token is bound to the original holder.  
+   - Encrypting or encapsulating the token only protects confidentiality and integrity of the data, not *who currently possesses the right to exercise it*.
+
+   Once inside the broker, the message becomes generic payload:
+   **any eligible consumer can retrieve it, regardless of the original Subject.**
+
+   **At this point, the consumer must present a new identity to continue the transaction** —  
+   whether that identity is a Service Account, a SPIFFE/SVID workload identity, or any other local principal.  
+   This is a *new subject*, not a continuation of the original holder-binding.  
+   The system has introduced a new principal into the transaction without provenance.
+
+   **This does not preserve identity continuity — it replaces it.**  
+   The Consumer is now acting on its own behalf, not on behalf of the original Subject.  
+   Token replay, token minting, or workload-generated credentials at this stage are all forms of subject substitution and introduce new attack surfaces.
+
+![Token use case](./images/usecase-1.png)
+
+### Why This Use Case Proves the Superset
+
+- **Bearer semantics collapse at the asynchronous boundary.**  
+- **No mechanism exists to preserve holder-binding across message brokers.**  
+- **Replay or re-minting introduces a new principal and a new attack surface.**
+
+This is the minimal configuration that invalidates snapshot-based identity models.  
+Synchronous handoffs remain a trivial subset; distributed flows expose the real constraint.
+
+## DID-based Trust Chains
+
+Using the DID-based trust chain model ( [DIF Work Item Proposal Draft](2025-11-24-dif-work-item-proposal.md)), identity continuity is preserved
+because capability is always delegated from a cryptographic principal
+(From DID) to another cryptographic principal (To DID), not replayed.
+
+![Token use case](./images/usecase-2.png)
+
+At each hop, the node MUST validate the incoming capability against its
+local policy engine (PDP):
+
+- The peer identity (From DID) MUST be authenticated.
+- The peer MUST have been explicitly delegated a capability to act
+  in the scope of the transaction.
+- The receiving identity (To DID) MAY elevate only within its own
+  authorization boundaries.
+- Capability MUST be contextual to the transaction and MUST NOT be
+  transferable beyond it.
+
+This evaluation replaces token forwarding.
+No identity artifacts are transported; only verifiable delegation is.
+
+![Token use case](./images/usecase-2.png)
+
+> **NOTE:** Trust Plane trust assumptions are equivalent to those of a conventional Authorization Server.  
+> The distinction lies in the artifact it produces.  
+> Traditional Authorization Servers issue bearer-based authorization snapshots.  
+> A Trust Plane issues provenance-linked capability delegations that extend identity continuity across distributed transactions.
+
+## DID BASED TRANSACTION FLOW
+
+At this stage, the distributed transaction preserves continuity of identity across hops.
+
+Each hop operates under a verifiable capability delegated **on behalf of the Alice DID**, rather than replaying or reminting an authorization artifact.
+
+![Token  case](./images/distributed-transaction.png)
+
+The transaction remains a distributed execution flow.
+
+## TRUSTED AI AGENTS
+
+Let us now assume that the entity previously referred to as the “Red Corporate Worker” is replaced by an **AI Agent**.
+
+During the Trusted AI Agent working session, Alan Karp articulated the core requirement for a Trusted AI Agent:
+
+> **The possession of a valid token is not sufficient.  
+> Authorization must depend on whether the Agent is trusted for the specific task/risk model.  
+> If the capability involves payment, and the Agent is not trusted for financial operations,  
+> the authorization MUST be denied even if the Agent presents a valid token.**
+
+This requirement illustrates why token-based authorization is insufficient in distributed systems.
+
+### DID-Anchored AI Agents
+
+Assume the AI Agent has its own DID.  
+Its DID is registered in a decentralized DID Trust Registry.
+
+> **NOTE:** The [Trusted AI Agents Working Group (WG) Components]  
+> (https://github.com/decentralized-identity/trusted-ai-agents/blob/main/work_items/use_cases/use-case-clusters-components.md)  
+> define how trust properties, identity, and capabilities are represented.
+
+![Token  case](./images/distributed-transaction-ai.png)
+
+
+The AI Agent can present a **Verifiable Presentation** containing ontology about:
+
+- its trust level,
+- its capability set,
+- its provenance,
+- risk score,
+- its safety constraints or operational boundaries.
+
+### Where the DID-Based Trust Chain Governs
+
+At this point, the DID-based Trust Chain becomes decisive:
+
+> **Authorization is not driven by the existence of a capability,  
+> but by whether the capability is *trusted in context*.**
+
+If Alice’s policy states:
+
+- **“This Agent MAY NOT exercise payment capabilities.”**  
+  The transaction MUST be terminated immediately.  
+  The presented capability is **not valid in this context**,  
+  and the Verifier MUST reject it, even if it is cryptographically correct.
+
+There is no ambiguity:
+
+- Capability is contextual.  
+- Trust is task-specific.  
+- Authorization is a decision of governance, not permission replay.
+
+The transaction MUST terminate if trust conditions are not satisfied.
 
 ## Appendix
 
