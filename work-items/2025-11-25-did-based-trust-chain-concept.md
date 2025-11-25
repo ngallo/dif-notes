@@ -56,7 +56,7 @@ the environment where distributed transactions actually operate — **asynchrono
 
 Only in asynchronous flows do the fundamental constraints emerge:
 
-- **Using bearer tokens the Identity continuity cannot be assumed across asynchronous boundaries.**  
+- **Identity continuity MUST be cryptographically preserved through provable delegation. Replacing the Subject identity at any hop creates a new principal and MUST be treated as an attack surface.**
 - **Bearer tokens cannot preserve holder-authenticity or capability-context across asynchronous boundaries.**  
 - **Minting replacements violates subject integrity.**  
 - **Capability must be delegated, not replayed.**
