@@ -2,7 +2,7 @@
 
 This document is explains concepts related to the proposal in [DIF Work Item Proposal (Draft)](2025-11-24-dif-work-item-proposal.md) and is intended to illustrate the core idea of using DID-based trust chains for workloads and agents.
 
-This document includes important requirements from the previous Trusted AI Working Group at DIF session, where we defined the components, as well as requirements from Alan Karp.
+This document includes important requirements from the previous Trusted AI Working Group at DIF session, where we defined the components, as well as requirements from [Alan Karp](https://github.com/alanhkarp).
 
 ## Paradigm Shift for Authorization in Distributed Transactions
 
@@ -201,7 +201,7 @@ The transaction remains a distributed execution flow.
 
 Let us now assume that the entity previously referred to as the “Red Corporate Worker” is replaced by an **AI Agent**.
 
-During the Trusted AI Agent working session, Alan Karp articulated the core requirement for a Trusted AI Agent:
+During the Trusted AI Agent working session,  [Alan Karp](https://github.com/alanhkarp) articulated the core requirement for a Trusted AI Agent:
 
 > **The possession of a valid token/capability is not sufficient.  
 > Authorization must depend on whether the Agent is trusted for the specific task/risk model.  
