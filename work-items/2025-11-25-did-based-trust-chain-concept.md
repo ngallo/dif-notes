@@ -4,6 +4,8 @@ This document is explains concepts related to the proposal in [DIF Work Item Pro
 
 This document includes important requirements from the previous Trusted AI Working Group at DIF session, where we defined the components, as well as requirements from [Alan Karp](https://github.com/alanhkarp).
 
+> Here the [Use Cases for Access Management](https://alanhkarp.com/UseCases.pdf).
+
 ## Paradigm Shift for Authorization in Distributed Transactions
 
 The current approach aims to define a robust authorization flow that supports workloads and AI Agents.  
